@@ -1,12 +1,12 @@
 import { useContext } from 'react';
 import CurrentUserContext from '../../contexts/CurrentUserContext';
-import Popup from './Popup/Popup.tsx';
+import Popup from './popup/popup.tsx';
 import type { PopupConfig } from '../../interfaces/ModalData';
 import type { CardData } from '../../interfaces/CardData';
-import NewCard from './Popup/NewCard/NewCard.tsx';
-import EditProfile from './Popup/EditProfile/EditProfile.tsx';
-import EditAvatar from './Popup/EditAvatar/EditAvatar.tsx';
-import Card from './Card/Card.tsx';
+import NewCard from './popup/newcard/newcard.tsx';
+import EditProfile from './popup/editprofile/editprofile.tsx';
+import EditAvatar from './popup/editavatar/editavatar.tsx';
+import Card from './card/card.tsx';
 
 type MainProps = {
   cards: CardData[];

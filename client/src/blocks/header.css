@@ -3,6 +3,7 @@
   font-family: "Inter", Arial, sans-serif;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   border-bottom: 1px solid rgba(84, 84, 84, 0.7);
 }
 
@@ -10,6 +11,33 @@
   width: 173px;
   height: 33px;
   object-fit: contain;
+}
+
+.header__nav {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.header__email {
+  color: #fff;
+  font-size: 14px;
+  margin: 0;
+}
+
+.header__link {
+  color: #fff;
+  font-size: 14px;
+  text-decoration: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  font-family: inherit;
+}
+
+.header__link:hover {
+  opacity: 0.7;
 }
 
 @media screen and (max-width: 544px) {
@@ -21,5 +49,14 @@
     width: 126px;
     height: 24px;
     margin: 0 0 0 7px;
+  }
+
+  .header__nav {
+    gap: 12px;
+    margin-right: 7px;
+  }
+
+  .header__email {
+    display: none;
   }
 }

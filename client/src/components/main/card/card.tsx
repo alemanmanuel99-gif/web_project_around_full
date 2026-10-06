@@ -1,7 +1,7 @@
 import { useContext } from 'react';
 import type { CardData } from '../../../interfaces/CardData';
 import type { PopupConfig } from '../../../interfaces/ModalData';
-import ImagePopup from '../Popup/ImagePopup/ImagePopup.tsx';
+import ImagePopup from '../popup/imagepopup/imagepopup.tsx';
 import CurrentUserContext from '../../../contexts/CurrentUserContext';
 
 type CardProps = {
