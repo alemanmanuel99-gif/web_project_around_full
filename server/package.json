@@ -1,0 +1,42 @@
+{
+  "name": "web_project_around_express",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/app.js",
+    "dev": "tsx watch src/app.ts",
+    "lint": "eslint src/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alemanmanuel99-gif/web_project_around_express.git"
+  },
+  "keywords": [],
+  "author": "Manuel Aleman",
+  "license": "ISC",
+  "type": "module",
+  "bugs": {
+    "url": "https://github.com/alemanmanuel99-gif/web_project_around_express/issues"
+  },
+  "homepage": "https://github.com/alemanmanuel99-gif/web_project_around_express#readme",
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.2.1",
+    "mongoose": "^9.10.1"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^26.5.0",
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.8",
+    "mongoose": "^9.10.1",
+    "prettier": "^3.9.6",
+    "tsx": "^4.23.13",
+    "typescript": "npm:@typescript/typescript6@^6.0.2",
+    "typescript-eslint": "^8.69.0"
+  }
+}
