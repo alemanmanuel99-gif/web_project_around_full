@@ -18,7 +18,7 @@ async function ensureDemoUser(): Promise<void> {
     _id: DEMO_USER_ID,
     name: 'Jacques Cousteau',
     about: 'Explorador',
-    avatar: 'https://i.pravatar.cc/300?img=12',
+    avatar: 'https://picsum.photos/300',
   });
   console.warn('Usuario de demostración creado');
 }
@@ -27,7 +27,11 @@ mongoose
   .connect('mongodb://localhost:27017/aroundb')
   .then(async () => {
     console.warn('Conectado a la base de datos aroundb');
-    await ensureDemoUser();
+    try {
+      await ensureDemoUser();
+    } catch (err) {
+      console.error('Error al crear el usuario de demostración', err);
+    }
   })
   .catch((err) => console.error('Error al conectar a MongoDB', err));
 
