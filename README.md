@@ -29,6 +29,25 @@ Funcionalidad principal:
 - API de autenticación externa de TripleTen para registro, inicio de sesión y verificación de token
 - Metodología **BEM** para las hojas de estilo
 
+## Consideraciones de seguridad
+
+Análisis realizado sobre el propio código a partir de la lección de seguridad del sprint:
+
+**Protecciones ya presentes**
+
+- **XSS en contenido generado por el usuario**: React escapa automáticamente todo el texto renderizado (`{currentUser?.name}`, `{card.name}`, etc.). No se usa `dangerouslySetInnerHTML` en ningún componente, por lo que no hay inyección de HTML o scripts por esa vía.
+- **XSS vía URLs de imagen** (`avatar`, `link` de tarjeta): el servidor valida ambas URLs con una expresión regular que exige el esquema `http://` o `https://`, bloqueando URLs tipo `javascript:...` que podrían ejecutarse al interactuar con la imagen.
+- **El manejador de errores no filtra información sensible**: ante un error 500 responde con un mensaje genérico ("Ha ocurrido un error en el servidor") en lugar de exponer el stack trace o detalles internos.
+- **Dependencias**: se corrigió una vulnerabilidad crítica de IP spoofing en `proxy-addr` (dependencia transitiva de Express) mediante `npm audit fix`. Ambas mitades del proyecto están actualmente en 0 vulnerabilidades conocidas.
+
+**Dónde se guarda el token, y el trade-off que implica**
+
+El token JWT se guarda en `localStorage`, tal como pide este sprint. Es simple y funciona bien, pero tiene un riesgo conocido: si en el futuro se introdujera una vulnerabilidad XSS (por ejemplo, a través de una dependencia de terceros comprometida), un script malicioso podría leer `localStorage` y robar el token — algo que no sería posible si el token viviera en una cookie `httpOnly`. Hoy no hay ningún vector de XSS abierto en el código, así que el riesgo es bajo, pero es justamente el motivo por el que el siguiente sprint se enfoca en proteger la aplicación desde el servidor (típicamente migrando a cookies `httpOnly` + protección CSRF).
+
+**Pendiente para el siguiente sprint (fuera de alcance actual)**
+
+El endpoint `deleteCard` del servidor no verifica que la tarjeta pertenezca al usuario que hace la petición: cualquier usuario autenticado podría eliminar tarjetas ajenas. Hoy esto no tiene impacto práctico porque el middleware temporal asigna el mismo `req.user._id` a todas las peticiones (aún no hay usuarios reales en la API propia), pero es un control de acceso (IDOR) que debe añadirse cuando se implemente autenticación real en el backend.
+
 ## Cómo ejecutar el proyecto
 
 ```bash
