@@ -6,8 +6,7 @@ interface IUser {
   avatar: string;
 }
 
-const urlRegex =
-  /^(https?:\/\/)(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+(\/[\w~:/?%#[\]@!$&'()*+,;=.]*)?#?$/;
+const urlRegex = /^https?:\/\/[^\s/$.?#][^\s]*$/i;
 
 const userSchema = new Schema<IUser>({
   name: {

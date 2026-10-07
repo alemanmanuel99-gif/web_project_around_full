@@ -8,8 +8,7 @@ interface ICard {
   createdAt: Date;
 }
 
-const urlRegex =
-  /^(https?:\/\/)(www\.)?[a-zA-Z0-9-]+\.[a-zA-Z0-9-]+(\/[\w~:/?%#[\]@!$&'()*+,;=.]*)?#?$/;
+const urlRegex = /^https?:\/\/[^\s/$.?#][^\s]*$/i;
 
 const cardSchema = new Schema<ICard>({
   name: {
