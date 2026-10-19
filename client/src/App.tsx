@@ -8,7 +8,7 @@ import Register from './components/register/register';
 import ProtectedRoute from './components/protectedroute/protectedroute';
 import InfoTooltip from './components/infotooltip/infotooltip';
 import api from './utils/api';
-import { registerUser, loginUser, checkToken } from './utils/auth';
+import { registerUser, loginUser } from './utils/auth';
 import CurrentUserContext from './contexts/CurrentUserContext';
 import type { UserData } from './interfaces/UserData';
 import type { CardData } from './interfaces/CardData';
@@ -30,7 +30,6 @@ function App(): React.JSX.Element {
   const [popup, setPopup] = useState<PopupConfig | null>(null);
 
   const [loggedIn, setLoggedIn] = useState<boolean>(false);
-  const [userEmail, setUserEmail] = useState<string>('');
   const [isCheckingToken, setIsCheckingToken] = useState<boolean>(true);
   const [tooltip, setTooltip] = useState<TooltipState>({
     isOpen: false,
@@ -38,21 +37,7 @@ function App(): React.JSX.Element {
     message: '',
   });
 
-  useEffect(() => {
-    (async () => {
-      try {
-        const [userData, initialCards] = await Promise.all([
-          api.getUserInfo(),
-          api.getInitialCards(),
-        ]);
-        setCurrentUser(userData);
-        setCards(initialCards);
-      } catch (error) {
-        console.error(error);
-      }
-    })();
-  }, []);
-
+  // Al cargar la página: GET /users/me valida el token y, de paso, trae el perfil completo
   useEffect(() => {
     (async () => {
       const token = localStorage.getItem('jwt');
@@ -61,9 +46,9 @@ function App(): React.JSX.Element {
         return;
       }
       try {
-        const res = await checkToken(token);
+        const userData = await api.getUserInfo();
+        setCurrentUser(userData);
         setLoggedIn(true);
-        setUserEmail(res.data.email);
       } catch (error) {
         console.error(error);
         localStorage.removeItem('jwt');
@@ -72,6 +57,19 @@ function App(): React.JSX.Element {
       }
     })();
   }, []);
+
+  // Las tarjetas se piden solo con sesión iniciada: la API ya no responde sin token
+  useEffect(() => {
+    if (!loggedIn) return;
+    (async () => {
+      try {
+        const initialCards = await api.getInitialCards();
+        setCards(initialCards);
+      } catch (error) {
+        console.error(error);
+      }
+    })();
+  }, [loggedIn]);
 
   function showTooltip(isSuccess: boolean, message: string): void {
     setTooltip({ isOpen: true, isSuccess, message });
@@ -94,11 +92,10 @@ function App(): React.JSX.Element {
 
   const handleLogin = async (email: string, password: string) => {
     try {
-      const { token } = await loginUser(email, password);
+      const { token, user } = await loginUser(email, password);
       localStorage.setItem('jwt', token);
-      const res = await checkToken(token);
+      setCurrentUser(user);
       setLoggedIn(true);
-      setUserEmail(res.data.email);
       navigate('/');
     } catch (error) {
       console.error(error);
@@ -109,7 +106,8 @@ function App(): React.JSX.Element {
   const handleLogout = () => {
     localStorage.removeItem('jwt');
     setLoggedIn(false);
-    setUserEmail('');
+    setCurrentUser(null);
+    setCards([]);
     navigate('/signin');
   };
 
@@ -199,7 +197,7 @@ function App(): React.JSX.Element {
           element={
             <ProtectedRoute loggedIn={loggedIn} isCheckingToken={isCheckingToken}>
               <div className="page__content">
-                <Header loggedIn={loggedIn} userEmail={userEmail} onLogout={handleLogout} />
+                <Header loggedIn={loggedIn} userEmail={currentUser?.email ?? ''} onLogout={handleLogout} />
                 <Main
                   cards={cards}
                   popup={popup}

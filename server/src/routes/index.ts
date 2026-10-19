@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { usersRouter } from './users.js';
 import { cardsRouter } from './cards.js';
+import { httpError } from '../utils/http-error.js';
 
 const router = Router();
 
@@ -9,8 +10,8 @@ router.use('/users', usersRouter);
 router.use('/cards', cardsRouter);
 
 // Captura global de rutas no existentes (Requisito de la rúbrica)
-router.use((req, res) => {
-  res.status(404).json({ message: 'Recurso solicitado no encontrado' });
+router.use(() => {
+  throw httpError(404, 'Recurso solicitado no encontrado');
 });
 
 export default router;

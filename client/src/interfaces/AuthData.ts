@@ -1,17 +1,6 @@
-export interface RegisterResponse {
-  data: {
-    email: string;
-    _id: string;
-  };
-}
+import type { UserData } from './UserData';
 
 export interface LoginResponse {
   token: string;
-}
-
-export interface CheckTokenResponse {
-  data: {
-    _id: string;
-    email: string;
-  };
+  user: UserData;
 }

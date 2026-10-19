@@ -7,6 +7,7 @@ import NewCard from './popup/newcard/newcard.tsx';
 import EditProfile from './popup/editprofile/editprofile.tsx';
 import EditAvatar from './popup/editavatar/editavatar.tsx';
 import Card from './card/card.tsx';
+import editIcon from '../../images/edit-icon.svg';
 
 type MainProps = {
   cards: CardData[];
@@ -45,7 +46,7 @@ function Main(props: MainProps): React.JSX.Element {
           >
             <img
               className="profile__image-edit-icon"
-              src="./src/images/edit-icon.svg"
+              src={editIcon}
               alt="Editar avatar"
             />
           </div>
@@ -87,4 +88,4 @@ function Main(props: MainProps): React.JSX.Element {
   );
 }
 
-export default Main;
+export default Main;

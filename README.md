@@ -2,6 +2,11 @@
 
 Aplicación web full-stack que combina un front end en React con una API propia en Express. Permite a un usuario registrarse, iniciar sesión y gestionar su perfil y una galería de tarjetas de lugares de los EE. UU.
 
+## Despliegue
+
+- **Front end:** PENDIENTE_URL_FRONTEND
+- **API:** PENDIENTE_URL_API
+
 ## Descripción y funcionalidad
 
 El proyecto está dividido en dos mitades que viven en un mismo repositorio:
@@ -11,10 +16,10 @@ El proyecto está dividido en dos mitades que viven en un mismo repositorio:
 
 Funcionalidad principal:
 
-- **Registro e inicio de sesión** de usuarios contra la API de autenticación, con persistencia de sesión mediante un token JWT guardado en `localStorage`.
+- **Registro e inicio de sesión** contra la API propia (`POST /signup` y `POST /signin`): contraseñas hasheadas con bcrypt y tokens JWT firmados por el servidor, que el cliente guarda en `localStorage`.
 - **Rutas protegidas**: el contenido principal (`/`) solo es accesible para usuarios autenticados; los visitantes son redirigidos a `/signin`. Un usuario ya autenticado que intenta visitar `/signin` o `/signup` es redirigido a `/`.
 - **Perfil de usuario**: ver y editar nombre, descripción y avatar.
-- **Galería de tarjetas**: agregar nuevas tarjetas, dar/quitar "me gusta" y eliminar tarjetas propias.
+- **Galería de tarjetas**: cada tarjeta tiene dueño. Cada persona ve solo sus tarjetas y solo ella puede borrarlas o cambiar sus "me gusta" (el servidor responde 403 si no es suya).
 - **Retroalimentación visual** (InfoTooltip) sobre el resultado del registro y el inicio de sesión.
 - **Cierre de sesión**, que limpia el token y regresa la aplicación al estado de visitante.
 
@@ -26,7 +31,10 @@ Funcionalidad principal:
 - **Express** + **TypeScript** para la API REST propia
 - **MongoDB** / Mongoose como base de datos
 - **CORS** configurado entre el front end (`http://localhost:3000`) y la API propia (`http://localhost:3001`)
-- API de autenticación externa de TripleTen para registro, inicio de sesión y verificación de token
+- **bcryptjs** y **jsonwebtoken** para la autenticación propia
+- **express-rate-limit** en `/signin` y `/signup`
+- **dotenv** para la configuración del servidor y variables `VITE_` para el cliente
+- Despliegue en **Vercel** (dos proyectos: `server` y `client`) con **MongoDB Atlas**
 - Metodología **BEM** para las hojas de estilo
 
 ## Consideraciones de seguridad
@@ -44,15 +52,20 @@ Análisis realizado sobre el propio código a partir de la lección de seguridad
 
 El token JWT se guarda en `localStorage`, tal como pide este sprint. Es simple y funciona bien, pero tiene un riesgo conocido: si en el futuro se introdujera una vulnerabilidad XSS (por ejemplo, a través de una dependencia de terceros comprometida), un script malicioso podría leer `localStorage` y robar el token — algo que no sería posible si el token viviera en una cookie `httpOnly`. Hoy no hay ningún vector de XSS abierto en el código, así que el riesgo es bajo, pero es justamente el motivo por el que el siguiente sprint se enfoca en proteger la aplicación desde el servidor (típicamente migrando a cookies `httpOnly` + protección CSRF).
 
-**Pendiente para el siguiente sprint (fuera de alcance actual)**
+**Resuelto en el sprint 16**
 
-El endpoint `deleteCard` del servidor no verifica que la tarjeta pertenezca al usuario que hace la petición: cualquier usuario autenticado podría eliminar tarjetas ajenas. Hoy esto no tiene impacto práctico porque el middleware temporal asigna el mismo `req.user._id` a todas las peticiones (aún no hay usuarios reales en la API propia), pero es un control de acceso (IDOR) que debe añadirse cuando se implemente autenticación real en el backend.
+- El middleware temporal con un `_id` fijo se eliminó: `req.user` lo llena un middleware que verifica el JWT y responde 401 si falta, está mal formado o expiró.
+- `deleteCard`, `likeCard` y `dislikeCard` comprueban primero que la tarjeta exista (404) y después que sea de quien la pide (403), cerrando el IDOR que quedó pendiente.
+- Ninguna respuesta incluye el hash de la contraseña, y el correo solo lo ve su dueño.
+- Los secretos y la configuración viven en variables de entorno (`server/.env.example` y `client/.env.example` muestran las claves necesarias).
 
 ## Cómo ejecutar el proyecto
 
 ```bash
 npm run install:all
 ```
+
+Crea `server/.env` a partir de `server/.env.example` (con un `JWT_SECRET` generado con `node -e "console.log(require('crypto').randomBytes(32).toString('hex'));"`) y `client/.env` a partir de `client/.env.example`.
 
 Levanta cada mitad en su propia terminal (MongoDB debe estar corriendo antes de iniciar el servidor):
 

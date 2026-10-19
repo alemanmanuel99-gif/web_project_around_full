@@ -3,11 +3,19 @@ import type { CardData } from '../interfaces/CardData';
 
 class Api {
   private _baseUrl: string;
-  private _headers: Record<string, string>;
+  private _baseHeaders: Record<string, string>;
 
   constructor(options: { baseUrl: string; headers: Record<string, string> }) {
     this._baseUrl = options.baseUrl;
-    this._headers = options.headers;
+    this._baseHeaders = options.headers;
+  }
+
+  // Se arma en cada llamada para incluir el token vigente
+  private get _headers(): Record<string, string> {
+    const token = localStorage.getItem('jwt');
+    return token
+      ? { ...this._baseHeaders, Authorization: `Bearer ${token}` }
+      : this._baseHeaders;
   }
 
   async getUserInfo(): Promise<UserData> {
@@ -116,11 +124,13 @@ class Api {
   }
 }
 
+const API_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+
 const api = new Api({
-  baseUrl: 'http://localhost:3001',
+  baseUrl: API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
 });
 
-export default api;
+export default api;

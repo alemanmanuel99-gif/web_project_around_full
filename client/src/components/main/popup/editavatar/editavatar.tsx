@@ -6,9 +6,11 @@ export default function EditAvatar(): React.JSX.Element {
   const avatarRef = useRef<HTMLInputElement>(null);
   const [avatarError, setAvatarError] = useState('');
   const [avatarTouched, setAvatarTouched] = useState(false);
+  const [avatarValue, setAvatarValue] = useState('');
 
   const handleAvatarChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setAvatarTouched(true);
+    setAvatarValue(e.target.value);
     if (!e.target.validity.valid) {
       setAvatarError(e.target.validationMessage);
     } else {
@@ -16,7 +18,7 @@ export default function EditAvatar(): React.JSX.Element {
     }
   };
 
-  const isFormValid = avatarTouched && !avatarError && avatarRef.current?.value !== '';
+  const isFormValid = avatarTouched && !avatarError && avatarValue !== '';
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -49,4 +51,4 @@ export default function EditAvatar(): React.JSX.Element {
       </button>
     </form>
   );
-}
+}
