@@ -16,10 +16,30 @@ const PORT = process.env.PORT || 3001;
 // Vercel pone un proxy delante: confiamos solo en ese primero
 app.set('trust proxy', 1);
 
-mongoose
-  .connect(process.env.MONGO_URI!, { maxPoolSize: 10 })
-  .then(() => console.warn('Conectado a la base de datos'))
-  .catch((err) => console.error('Error al conectar a MongoDB', err));
+// En Vercel la función se congela entre peticiones: guardamos la conexión en curso
+// y la reintentamos si el intento anterior falló
+let dbConnection: Promise<typeof mongoose> | null = null;
+
+const connectToDatabase = () => {
+  if (mongoose.connection.readyState === 1) {
+    return Promise.resolve(mongoose);
+  }
+  if (!dbConnection) {
+    dbConnection = mongoose
+      .connect(process.env.MONGO_URI!, { maxPoolSize: 10 })
+      .then((connection) => {
+        console.warn('Conectado a la base de datos');
+        return connection;
+      })
+      .catch((err) => {
+        dbConnection = null;
+        throw err;
+      });
+  }
+  return dbConnection;
+};
+
+connectToDatabase().catch((err) => console.error('Error al conectar a MongoDB', err));
 
 app.use(cors({ origin: process.env.CLIENT_ORIGIN || 'http://localhost:3000' }));
 
@@ -29,6 +49,12 @@ app.use(express.urlencoded({ extended: true }));
 // Ruta de estado: responde siempre igual, sin base de datos ni token
 app.get('/health', (_req, res) => {
   res.status(200).send({ status: 'ok' });
+});
+
+// Las rutas siguientes usan la base: esperan a que la conexión esté lista
+app.use(async (_req, _res, next) => {
+  await connectToDatabase();
+  next();
 });
 
 // Rutas abiertas: son las que entregan el token
