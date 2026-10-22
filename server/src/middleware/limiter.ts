@@ -1,4 +1,4 @@
-import rateLimit from 'express-rate-limit';
+import { rateLimit } from 'express-rate-limit';
 
 // Inicio de sesión: una persona lo hace seguido, un bot que prueba contraseñas lo hace miles de veces
 export const signinLimiter = rateLimit({
