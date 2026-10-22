@@ -4,8 +4,8 @@ Aplicación web full-stack que combina un front end en React con una API propia 
 
 ## Despliegue
 
-- **Front end:** PENDIENTE_URL_FRONTEND
-- **API:** PENDIENTE_URL_API
+- **Front end:** https://web-project-around-full-tdjl.vercel.app
+- **API:** https://web-project-around-full-seven.vercel.app
 
 ## Descripción y funcionalidad
 

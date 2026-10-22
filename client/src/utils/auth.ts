@@ -1,7 +1,7 @@
 import type { UserData } from '../interfaces/UserData';
 import type { LoginResponse } from '../interfaces/AuthData';
 
-const BASE_URL = import.meta.env.VITE_API_URL ?? 'http://localhost:3001';
+const BASE_URL = (import.meta.env.VITE_API_URL ?? 'http://localhost:3001').replace(/\/+$/, '');
 
 async function checkResponse<T>(res: Response): Promise<T> {
   if (res.ok) return res.json();
